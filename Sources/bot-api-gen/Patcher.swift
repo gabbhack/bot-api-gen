@@ -18,7 +18,7 @@ enum PatchError: Error {
   case invalidProperty(String)
 }
 
-func patch(_ argument: Argument) -> Argument? {
+func patch(_ argument: Argument, _ method: Method) -> Argument? {
   var argument = argument
   switch argument.kind {
   // Hardcoded type for `InputFile or String`
@@ -56,7 +56,7 @@ func patch(_ argument: Argument) -> Argument? {
 
 func patch(_ method: Method) -> Method? {
   var method = method
-  method.arguments = method.arguments?.compactMap { argument in patch(argument) }
+  method.arguments = method.arguments?.compactMap { argument in patch(argument, method) }
   switch method.return_type {
   // Hardcoded type for methods that always return True
   case .bool(let boolKind) where boolKind.default_value == true:
@@ -73,7 +73,7 @@ func patch(_ method: Method) -> Method? {
 }
 
 // fuck DRY
-func patch(_ property: Property) -> Property? {
+func patch(_ property: Property, _ object: Object) -> Property? {
   var property = property
   switch property.kind {
   // Hardcoded type for `InputFile or String`
@@ -96,7 +96,7 @@ func patch(_ object: Object) -> Object? {
   } else {
     var object = object
     if case .properties(let propertiesKind) = object.data {
-      let patched = propertiesKind.properties.compactMap { property in patch(property) }
+      let patched = propertiesKind.properties.compactMap { property in patch(property, object) }
       object.data = .properties(PropertiesKind(properties: patched))
     }
     return object
