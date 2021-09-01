@@ -12,8 +12,12 @@ let CONFIG = Config(
   typeTemplate: "Type.swift", typeSaveTo: "generated/types", methodTemplate: "Method.swift",
   methodSaveTo: "generated/methods")
 
-let SKIPPED_OBJECTS = [
-  "Update", "Message", "Chat", "InlineQueryResult", "InputFile", "KeyboardButtonPollType",
+let SKIPPED_OBJECTS: [String] = [
+  "Update", "Message", "Chat", "ChatMember", "InlineQueryResult", "InputFile",
+  "KeyboardButtonPollType",
+
 ]
 
-let SKIPPED_METHODS = []
+let SKIPPED_METHODS: [String] = [
+
+  ]
