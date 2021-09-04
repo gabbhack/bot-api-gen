@@ -7,6 +7,7 @@ Types and methods generator for `tbot`.
 ### Requirements
 
 - Swift 5.4.0
+- swift-format
 
 ### Installation
 
