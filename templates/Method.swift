@@ -1,3 +1,5 @@
+import Foundation
+
 {% for line in method.description %}
 /// {{ line }}
 {% endfor %}

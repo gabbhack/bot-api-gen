@@ -2,6 +2,10 @@
 var skipped_objects = SKIPPED_OBJECTS
 // Hardcoded arguments
 let CHAT_ID_ARGUMENTS = ["chat_id", "from_chat_id"]
+// Hardcoded until_date
+let UNTIL_DATE_STUFF = [
+  "ChatMemberRestricted", "ChatMemberBanned", "banChatMember", "restrictChatMember",
+]
 
 func is_skipped(_ object: Object) -> Bool {
   // Skip all enum objects since we write them by hand
@@ -17,6 +21,8 @@ enum PatchError: Error {
   case invalidCase(String)
   case invalidProperty(String)
 }
+
+// Patch schema types
 
 func patch(_ argument: Argument, _ method: Method) -> Argument? {
   var argument = argument
@@ -47,8 +53,17 @@ func patch(_ argument: Argument, _ method: Method) -> Argument? {
           .reference(ReferenceKind(reference: "InputMediaDocument")),
           .reference(ReferenceKind(reference: "InputMediaPhoto")),
           .reference(ReferenceKind(reference: "InputMediaVideo")),
-        ])))):
+        ])))) where method.name == "sendMediaGroup":
     argument.kind = .reference(ReferenceKind(reference: "MediaGroup"))
+  // Hardcoded type for `emoji` argument in `sendDice`
+  case .string where argument.name == "emoji" && method.name == "sendDice":
+    argument.kind = .reference(ReferenceKind(reference: "DiceEmoji"))
+  // Hardcoded type for `until_date`
+  case .integer where argument.name == "until_date" && UNTIL_DATE_STUFF.contains(method.name):
+    argument.kind = .reference(ReferenceKind(reference: "UntilDate"))
+  // Hardcoded type for timestamp
+  case .integer where argument.description.contains("unix time") || argument.description.contains("Unix time"):
+    argument.kind = .reference(ReferenceKind(reference: "Date"))
   default: break
   }
   return argument
@@ -72,7 +87,6 @@ func patch(_ method: Method) -> Method? {
   return method
 }
 
-// fuck DRY
 func patch(_ property: Property, _ object: Object) -> Property? {
   var property = property
   switch property.kind {
@@ -84,6 +98,15 @@ func patch(_ property: Property, _ object: Object) -> Property? {
   case .anyOf(AnyOfKind(any_of: [.integer(IntegerKind()), .string(StringKind())]))
   where CHAT_ID_ARGUMENTS.contains(property.name):
     property.kind = .reference(ReferenceKind(reference: "ChatId"))
+  // Hardcoded type for `emoji` property in `Dice`
+  case .string where property.name == "emoji" && object.name == "Dice":
+    property.kind = .reference(ReferenceKind(reference: "DiceEmoji"))
+  // Hardcoded type for `until_date`
+  case .integer where property.name == "until_date" && UNTIL_DATE_STUFF.contains(object.name):
+    property.kind = .reference(ReferenceKind(reference: "UntilDate"))
+  // Hardcoded type for timestamp
+  case .integer where property.description.contains("unix time") || property.description.contains("Unix time"):
+    property.kind = .reference(ReferenceKind(reference: "Date"))
   default: break
   }
   return property
@@ -101,4 +124,21 @@ func patch(_ object: Object) -> Object? {
     }
     return object
   }
+}
+
+// Patch render types
+func patch(_ argument: ArgumentRender, _ method: inout MethodRender) -> ArgumentRender? {
+  return argument
+}
+
+func patch(_ method: MethodRender) -> MethodRender? {
+  return method
+}
+
+func patch(_ property: PropertyRender, _ type: inout TypeRender) -> PropertyRender? {
+  return property
+}
+
+func patch(_ type: TypeRender) -> TypeRender? {
+  return type
 }

@@ -1,3 +1,5 @@
+import Foundation
+
 {% if type.isEnum %}
 {% for line in type.description %}
 /// {{ line }}
