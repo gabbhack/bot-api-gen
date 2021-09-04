@@ -13,11 +13,16 @@ let CONFIG = Config(
   methodSaveTo: "generated/methods")
 
 let SKIPPED_OBJECTS: [String] = [
-  "Update", "Message", "Chat", "ChatMember", "InlineQueryResult", "InputFile",
+  "Update",
+  "Message",
+  "Chat",
+  "ChatMember",
+  "InlineQueryResult",
+  "InputFile",
   "KeyboardButtonPollType",
-
+  "EncryptedPassportElement",
 ]
 
 let SKIPPED_METHODS: [String] = [
 
-  ]
+]
