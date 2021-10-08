@@ -1,3 +1,4 @@
+# NOT MAINTAINED ANYMORE
 # bot-api-gen
 
 Types and methods generator for `tbot`.
